@@ -53,8 +53,25 @@ Also Required:
     - Growth Accelerators (Mystical Agriculture) (Not Required)
     
 ## Placement  
-More information coming soon
+###### Information about placement 
+I am using Iron Chests from the Iron Chests mod, but any chest should do.
+The Chest above the Robot is for Crop Sticks
+The Chest on the lefif for the finished 10/10/10 seeds
+The Chest in the middle (Behind the robot) is for extra outputs produced during the automated breeding process
+The Chest on the right is for the input seeds
+The trashcan to the left of the Robot is where the seeds that re not 10/10/10 will be dumped as the robot works
+The Computer Controlled seed analyzer to the Right of the robot is for analyzing the seeds the robot 
 
+the code referances the Computer Controlled Seed analyzers as follows:
+Analyzer 1: Analyzer to the front left of the Robot (For Parent 1)
+Analyzer 2: Analyzer directly in front of the Robot (For Child)
+Analyzer 3: Analyzer to the front eight of the Robot (For Parent 2)
+Analyzer 4: Analyzer to the right of the Robot
+
+The Farmland is referencd as follows:
+Slot  1: Farmland to the front left of the Robot (For Parent 1)
+Slot  0: Farmland directly in front of the Robot (For Child)
+Slot -1: Farmland to the front right of the Robot (For Parent 2)
 
 ![2021-12-09_15 48 42](https://user-images.githubusercontent.com/95875669/145482239-66589667-92c5-428c-8f8a-39e746185597.png)
 ![2021-12-09_15 48 51](https://user-images.githubusercontent.com/95875669/145482247-9b01364e-f985-4dcf-9901-dece6b9d3f77.png)
@@ -63,17 +80,19 @@ More information coming soon
 
 ## The Code
 
-The Code is Avaliable on Pastebin
+The Code is Avaliable on Pastebin, as well as here.
 
 For the Robot:
+Direct Link: https://pastebin.com/uSjibHSi
 
-    https://pastebin.com/uSjibHSi
+For OpenOS:
 
     pastebin get -f uSjibHSi crops_robot.lua
 
 for the Computer:
+Direct Link: https://pastebin.com/VrrGhuKT
 
-    https://pastebin.com/VrrGhuKT
+For OpenOS:
 
     pastebin get -f VrrGhuKT vrops_computer.lua
 
