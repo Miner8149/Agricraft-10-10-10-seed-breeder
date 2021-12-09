@@ -52,5 +52,23 @@ Also Required:
     - Support Equipment for Sprinklers (Nor Required)
     - Growth Accelerators (Mystical Agriculture) (Not Required)
     
-## Placement
+## Placement  
+More information coming soon
    
+
+## The Code
+
+The Code is Avaliable on Pastebin
+
+For the Robot:
+
+    https://pastebin.com/uSjibHSi
+
+    pastebin get -f uSjibHSi crops_robot.lua
+
+for the Computer:
+
+    https://pastebin.com/VrrGhuKT
+
+    pastebin get -f VrrGhuKT vrops_computer.lua
+
