@@ -1,4 +1,4 @@
-# Agricraft_10-10-10_Automation_1.12.2
+# Agricraft 10/10/10 Seed Breeder
 Code to automate the creation/breeding of 10/10/10 or 10 10 10 or 101010 seeds (however you type it) from Agricraft and Mystical Agriculture using OpenComputers in Minecraft version 1.12.2
 
 
