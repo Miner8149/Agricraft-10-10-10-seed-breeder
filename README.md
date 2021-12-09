@@ -54,7 +54,12 @@ Also Required:
     
 ## Placement  
 More information coming soon
-   
+
+
+![2021-12-09_15 48 42](https://user-images.githubusercontent.com/95875669/145482239-66589667-92c5-428c-8f8a-39e746185597.png)
+![2021-12-09_15 48 51](https://user-images.githubusercontent.com/95875669/145482247-9b01364e-f985-4dcf-9901-dece6b9d3f77.png)
+![2021-12-09_15 49 02](https://user-images.githubusercontent.com/95875669/145482258-bc0b2b86-fe8c-4b23-ab17-f08c9f7db93b.png)
+
 
 ## The Code
 
