@@ -23,10 +23,10 @@ The Robot is made with:
     
 Also Required:
 
-    - 1 Tier 2 Wireless Network Card
-    - 1 Internet Card
-    - 1 Charger
-    - 1 Block of Redstone (or another redstone power source)
+    - 1 Tier 2 Wireless Network Card (to communicate with the base computer)
+    - 1 Internet Card (to download the code to the robot)
+    - 1 Charger (to charge the robot)
+    - 1 Block of Redstone (or another redstone power source) (to turn the charger on)
     
 ###### The Computer
 The Computer System is setup with:
@@ -43,12 +43,12 @@ The Computer System is setup with:
     
 Also Required:
 
-    - 1 Power Converter
+    - 1 Power Converter (to power the system)
 
 ###### Other Pieces
     - At Least 4 Chests
     - 1 Trashcan (Extra Utilities 2) or an equivilant way to dispose of items, i.e. another chest
-    - Sprinklers (Agricraft) (Not Required)
+    - Sprinklers (Agricraft) (Not Required) (I highly reccomend some way to speed up the growth of the crops)
     - Support Equipment for Sprinklers (Nor Required)
     - Growth Accelerators (Mystical Agriculture) (Not Required)
     
