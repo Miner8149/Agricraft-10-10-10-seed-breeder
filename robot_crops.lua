@@ -38,6 +38,7 @@ local event = require("event")
 local numCropsticksPlaced = nil
 local childSeedPresent = false
 local actionSlot = 0
+local numParentSeedsObtained = 0
 local mode = "clipping"  --Availiable modes are clipping and replacing
 
 -- clipping mode will take a clipping of each new crop to replace both parents at once, 
@@ -116,7 +117,24 @@ end
 function getCropSticks() --keep 48 on the robot max, 8 min
   --print("Fetching Cropsticks")
   local cropstickcount = ic.getStackInInternalSlot(cropStickSlot)
+  if ((cropstickcount ~= nil) and (string.match(cropstickcount["name"], "crop") ~= "crop") and (string.match(cropstickcount["name"], "stick") ~= "stick"))  then
+    local cropStickSlotFree = false
+    for index=1, r.inventorySize() do
+      r.select(index)
+      cropstickcount = ic.getStackInInternalSlot(index)
+      if ((cropstickcount == nil) and ( (index ~= newParentSeedSlot) and (index ~= brokenParentSeedSlot) and (index ~= childSeedSlot) and (index ~= clippingSeedSlot) and (index ~= cropStickSlot) and (index ~= wateringCanSlot) and (index ~= clippersSlot) ) )
+        r.select(cropStickSlot)
+        r.transferTo(index)
+        cropStickSlotFree = true
+        index = r.inventorySize()
+      end
+    end
+    if not cropStickSlotFree then
+      storeOther(cropSickSlot)
+    end
+  end
   local getNumber = 0
+  cropstickcount = ic.getStackInInternalSlot(cropStickSlot)
   if(cropstickcount == nil) then
     getNumber = 48
   elseif (cropstickcount["size"] < 16) then
@@ -130,7 +148,7 @@ function getCropSticks() --keep 48 on the robot max, 8 min
   r.select(cropStickSlot)
   for index=1,ic.getInventorySize(s.top) do
     chestSlot = ic.getStackInSlot(s.top,index)
-    if (chestSlot ~= nil) then
+    if ((chestSlot ~= nil) and ((string.match(invSlot["name"], "crop") == "crop") and (string.match(invSlot["name"], "stick") == "stick"))) then
       if (chestSlot["size"] < getNumber) then
         ic.suckFromSlot(s.top,index,chestSlot["size"])
         getNumber = getNumber - chestSlot["size"]
@@ -284,15 +302,16 @@ function getNewSeeds()  --returns true on sucess, false otherwise
   r.select(newParentSeedSlot)
   for index=1,ic.getInventorySize(s.front) do
     chestSlot = ic.getStackInSlot(s.front,index)
-    if (chestSlot ~= nil) then
+    if ((chestSlot ~= nil) and (((string.match(invSlot["name"], "Seed") == "Seed") or (string.match(invSlot{"name"], "seed") == "seed")) or (string.match(invslot["name"], "clipping") == "clipping")))then
       numSeeds = chestSlot["size"]
       if (numSeeds==2) or (numSeeds==1) then
         ic.suckFromSlot(s.front,index,numSeeds)
-        print("Found Seeds")
+        print("Found Seeds/Clippings")
+        numParentSeedsObtained = numSeeds
         initParents(newParentSeedSlot)
         return true
       else
-        print("Not 2 or 1 Seeds!")
+        print("Not 2 or 1 Seeds/Clippings!")
         --return false
       end
     end
@@ -315,7 +334,9 @@ function clearInv()
   for index=1,r.inventorySize() do
     r.select(index)
     invSlot = ic.getStackInInternalSlot(index)
-    if ((string.match(invSlot["name"], "crop") == "crop") and (string.match(invSlot["name"], "stick") == "stick") and (index ~= 1))  then
+    if (invSlot == nil) then
+      --do nothing
+    elseif ((string.match(invSlot["name"], "crop") == "crop") and (string.match(invSlot["name"], "stick") == "stick") and (index ~= cropStickSlot))  then
       storeOther(index)
     elseif ((invSlot["name"] == "agricraft:clippers") and (index ~= clippersSlot)) then
       local subCheckInv = ic.getStackInInternalSlot(clippersSlot)
@@ -403,19 +424,19 @@ end
 function obtainClipping()
   local itemInClippersSlot = ic.getStackInInternalSlot(clippersSlot)
   local hasClippers = false
-  if (itemInClippersSlot["name"] == "agricraft:clippers") then
+  if ((itemInClippersSlot ~= nil) and (itemInClippersSlot["name"] == "agricraft:clippers")) then
     hasClippers = true
   else    --look for clippers
     r.select(clippersSlot)
     ic.equip()
     itemInClippersSlot = ic.getStackInInternalSlot(clippersSlot)
-    if (itemInClippersSlot["name"] == "agricraft:clippers") then
+    if ((itemInClippersSlot ~= nil) and (itemInClippersSlot["name"] == "agricraft:clippers")) then
       hasClippers = true
     else
       for index=1,r.inventorySize() do
         r.select(index)
         itemInClippersSlot = ic.getStackInInternalSlot(index)
-        if (itemInClippersSlot["name"] == "agricraft:clippers") then
+        if ((itemInClippersSlot ~= nil) and (itemInClippersSlot["name"] == "agricraft:clippers")) then
           r.transferTo(clippersSlot)
           hasClippers = true
         end
