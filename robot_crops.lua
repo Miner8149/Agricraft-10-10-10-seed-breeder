@@ -455,6 +455,10 @@ function obtainClipping(location)
       end
     end
   end
+  local itemInClippingSlot = ic.getStackInInternalSlot(clippingSeedSlot)
+  if (itemInClippingSlot ~= nil) then
+    clearInv()
+  end
   goTo(location, 0)
   r.select(clippersSlot)
   ic.equip()
