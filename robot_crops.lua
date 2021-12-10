@@ -122,7 +122,7 @@ function getCropSticks() --keep 48 on the robot max, 8 min
     for index=1, r.inventorySize() do
       r.select(index)
       cropstickcount = ic.getStackInInternalSlot(index)
-      if ((cropstickcount == nil) and ( (index ~= newParentSeedSlot) and (index ~= brokenParentSeedSlot) and (index ~= childSeedSlot) and (index ~= clippingSeedSlot) and (index ~= cropStickSlot) and (index ~= wateringCanSlot) and (index ~= clippersSlot) ) )
+      if ((cropstickcount == nil) and ( (index ~= newParentSeedSlot) and (index ~= brokenParentSeedSlot) and (index ~= childSeedSlot) and (index ~= clippingSeedSlot) and (index ~= cropStickSlot) and (index ~= wateringCanSlot) and (index ~= clippersSlot) ) ) then
         r.select(cropStickSlot)
         r.transferTo(index)
         cropStickSlotFree = true
