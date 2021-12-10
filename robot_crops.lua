@@ -148,7 +148,7 @@ function getCropSticks() --keep 48 on the robot max, 8 min
   r.select(cropStickSlot)
   for index=1,ic.getInventorySize(s.top) do
     chestSlot = ic.getStackInSlot(s.top,index)
-    if ((chestSlot ~= nil) and ((string.match(invSlot["name"], "crop") == "crop") and (string.match(invSlot["name"], "stick") == "stick"))) then
+    if ((chestSlot ~= nil) and ((string.match(chestSlot["name"], "crop") == "crop") and (string.match(chestSlot["name"], "stick") == "stick"))) then
       if (chestSlot["size"] < getNumber) then
         ic.suckFromSlot(s.top,index,chestSlot["size"])
         getNumber = getNumber - chestSlot["size"]
