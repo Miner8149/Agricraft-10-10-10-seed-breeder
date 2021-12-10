@@ -346,7 +346,7 @@ function clearInv()
         r.transferTo(clippersSlot)
         index = index - 1
       end
-    elseif ((string.match(invSlot["name"], "Seed") == "Seed") or (string.match(invSlot{"name"], "seed") == "seed")) then
+    elseif ((string.match(invSlot["name"], "Seed") == "Seed") or (string.match(invSlot["name"], "seed") == "seed")) then
       destroy(index)
     elseif (string.match(invslot["name"], "clipping") == "clipping") then
       destroy(index)
