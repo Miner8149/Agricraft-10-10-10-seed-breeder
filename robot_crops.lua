@@ -340,7 +340,7 @@ function clearInv()
       storeOther(index)
     elseif ((invSlot["name"] == "agricraft:clippers") and (index ~= clippersSlot)) then
       local subCheckInv = ic.getStackInInternalSlot(clippersSlot)
-      if (subCheckInv["name"] == "agricraft:clippers") then
+      if ((subCheckInv ~= nil) and (subCheckInv["name"] == "agricraft:clippers")) then
         storeOther(index)
       else
         r.transferTo(clippersSlot)
@@ -348,7 +348,7 @@ function clearInv()
       end
     elseif ((string.match(invSlot["name"], "Seed") == "Seed") or (string.match(invSlot["name"], "seed") == "seed")) then
       destroy(index)
-    elseif (string.match(invslot["name"], "clipping") == "clipping") then
+    elseif (string.match(invSlot["name"], "clipping") == "clipping") then
       destroy(index)
     elseif ((string.match(invSlot["name"], "water") == "water") and (string.match(invSlot["name"], "can") == "can") and (index ~= wateringCanSlot)) then
       local subCheckInv = ic.getStackInInternalSlot(wateringCanSlot)
