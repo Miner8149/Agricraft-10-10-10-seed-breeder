@@ -296,6 +296,12 @@ end
 
 function getNewSeeds()  --returns true on sucess, false otherwise
   print("Getting new Seeds")
+  local checkClipperSlot = ic.getStackInInternalSlot(clippersSlot)
+  if ((checkClipperSlot ~= nil) and (string.match(checkClipperSlot["name"], "clipper") == "clipper"))
+    mode = "clipping"
+  else
+    mode = "replacing"
+  end
   goTo(1, 2)
   local chestSlot = nil
   local numSeeds = 0
@@ -304,9 +310,15 @@ function getNewSeeds()  --returns true on sucess, false otherwise
     chestSlot = ic.getStackInSlot(s.front,index)
     if ((chestSlot ~= nil) and (((string.match(chestSlot["name"], "Seed") == "Seed") or (string.match(chestSlot["name"], "seed") == "seed")) or (string.match(chestSlot["name"], "clipping") == "clipping")))then
       numSeeds = chestSlot["size"]
-      if (numSeeds==2) or (numSeeds==1) then
+      if (numSeeds == 2) then
         ic.suckFromSlot(s.front,index,numSeeds)
-        print("Found Seeds/Clippings")
+        print("Found 2 Seeds/Clippings")
+        numParentSeedsObtained = numSeeds
+        initParents(newParentSeedSlot)
+        return true
+      elseif ((numSeeds == 1) and (mode == "clipping")) then
+        ic.suckFromSlot(s.front,index,numSeeds)
+        print("Found 1 Seeds/Clippings")
         numParentSeedsObtained = numSeeds
         initParents(newParentSeedSlot)
         return true
@@ -341,10 +353,10 @@ function clearInv()
       if (index ~= cropStickSlot) then
         storeOther(index)
       end
-    elseif (string.match(invSlot["name"], "clipper")) then
+    elseif (string.match(invSlot["name"], "clipper") == "clipper") then
       if (index ~= clippersSlot) then
         local subCheckInv = ic.getStackInInternalSlot(clippersSlot)
-        if ((subCheckInv ~= nil) and (string.match(subCheckInv["name"], "clipper"))) then
+        if ((subCheckInv ~= nil) and (string.match(subCheckInv["name"], "clipper") == "clipper")) then
           storeOther(index)
         else
           r.transferTo(clippersSlot)
@@ -417,31 +429,33 @@ function requestData(funct, slot) --can request init (0), isplant(1, slot), is c
   return returnVal
 end
 
-function obtainClipping()
+function obtainClipping(location)
   local itemInClippersSlot = ic.getStackInInternalSlot(clippersSlot)
   local hasClippers = false
-  if ((itemInClippersSlot ~= nil) and (string.match(itemInClippersSlot["name"], "clipper"))) then
+  if ((itemInClippersSlot ~= nil) and (string.match(itemInClippersSlot["name"], "clipper") == "clipper")) then
     hasClippers = true
   else    --look for clippers
     r.select(clippersSlot)
     ic.equip()
     itemInClippersSlot = ic.getStackInInternalSlot(clippersSlot)
-    if ((itemInClippersSlot ~= nil) and (string.match(itemInClippersSlot["name"], "clipper"))) then
+    if ((itemInClippersSlot ~= nil) and (string.match(itemInClippersSlot["name"], "clipper") == "clipper")) then
       hasClippers = true
     else
       for index=1,r.inventorySize() do
         r.select(index)
         itemInClippersSlot = ic.getStackInInternalSlot(index)
-        if ((itemInClippersSlot ~= nil) and (string.match(itemInClippersSlot["name"], "clipper"))) then
+        if ((itemInClippersSlot ~= nil) and (string.match(itemInClippersSlot["name"], "clipper") == "clipper")) then
           r.transferTo(clippersSlot)
           hasClippers = true
         end
       end
       if (hasClippers == false) then
+        mode = "replacing"
         return nil
       end
     end
   end
+  goTo(location, 0)
   r.select(clippersSlot)
   ic.equip()
   r.select(ClippingSeedSlot)
@@ -451,12 +465,15 @@ function obtainClipping()
   return gotClipping
 end
 
+--------------------------------------
 function setup()
   m.open(112)
 end
 
 setup()
+local loopOneControl = true
 while true do
+  loopOneControl = true
   while not (getCropSticks()) do
     os.sleep(10)
   end
@@ -470,12 +487,32 @@ while true do
   placeSingleCropstick(1, 0)
   placeDoubleCropstick(0, 0)
   placeSingleCropstick(-1, 0)
-  plantSeed(newParentSeedSlot, -1, 0)
-  plantSeed(newParentSeedSlot, 1, 0)
-  while true do
+  if (numParentSeedsObtained == 2) then
+    plantSeed(newParentSeedSlot, -1, 0)
+    plantSeed(newParentSeedSlot, 1, 0)
+  elseif (numParentSeedsObtained == 1)
+    plantSeed(newParentSeedSlot, 1, 0)
+    while true do
+      if (obtianClipping(1) == nil) then
+        loopOneControl = false
+      elseif (obtianClipping(1) == true) then
+        placeAnalyzeSeed(clippingSeedSlot)
+        getAnalyzedSeed(clippingSeedSlot)
+        plantSeed(clippingSeedSlot, -1, 0)
+        break
+      end
+      os.sleep(1) --wait for plant to grow more
+    end
+  end
+  while loopOneControl do
     while not (childSeedPresent) do
       waterCrops()
       childSeedPresent = requestData(1, 0)
+      --check for clippers
+      local invClipperSlot = ic.getStackInInternalSlot(clippersSlot)
+      if ((invClipperSlot ~= nil) and (string.match(itemInClippersSlot["name"], "clipper") == "clipper")) then
+        mode = "clipping"
+      end
     end
     breakChildSeed()
     childSeedPresent = false
@@ -483,21 +520,36 @@ while true do
     placeAnalyzeSeed(childSeedSlot)
     actionSlot = requestData(4, 0)
     getAnalyzedSeed(childSeedSlot)
-    if (actionSlot == 2) then --just a return val
+    if (actionSlot == 2) then --means that seed is 10 10 10
       storeFinished(childSeedSlot)
       breakAll()
       clearInv()
       break
-    elseif (actionSlot == 0) then --just a return val
+    elseif (actionSlot == 0) then --means the seed is equal to or less than parents (trash)
       destroy(childSeedSlot)
-    elseif (actionSlot == nil) then  --just a return val
+    elseif (actionSlot == nil) then  --the seed wasnt analyzed
       print("the seed wasnt analyzed")
       storeOther(childSeedSlot)
-    else
+    else                            -- 1 or -1 means it is better than the specified parent
       breakParentSeed(actionSlot)
       placeSingleCropstick(actionSlot, 0)
       plantSeed(childSeedSlot, actionSlot, 0)
       clearInv()
+      if (mode == "clipping") then
+        local invSlot = obtainClipping(actionSlot)
+        while (invSlot == false) or  then
+          invSlot = obtainClipping(actionSlot)
+        end
+      end
+      if (mode == "clipping") then
+        placeAnalyzeSeed(clippingSeedSlot)
+        actionSlot = requestData(4, 0)
+        getAnalyzedSeed(clippingSeedSlot)
+        breakParentSeed(actionSlot)
+        placeSingleCropstick(actionSlot, 0)
+        plantSeed(clippingSeedSlot, actionSlot, 0)
+        clearInv()
+      end
     end
   end
 end
