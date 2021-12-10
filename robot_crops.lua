@@ -297,7 +297,7 @@ end
 function getNewSeeds()  --returns true on sucess, false otherwise
   print("Getting new Seeds")
   local checkClipperSlot = ic.getStackInInternalSlot(clippersSlot)
-  if ((checkClipperSlot ~= nil) and (string.match(checkClipperSlot["name"], "clipper") == "clipper"))
+  if ((checkClipperSlot ~= nil) and (string.match(checkClipperSlot["name"], "clipper") == "clipper")) then
     mode = "clipping"
   else
     mode = "replacing"
