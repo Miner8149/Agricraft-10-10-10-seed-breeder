@@ -330,6 +330,7 @@ function initParents(slot)
 end
 
 function clearInv()
+  print("Clearing Inventory")
   local invSlot = nil
   for index=1,r.inventorySize() do
     r.select(index)
@@ -358,22 +359,10 @@ function clearInv()
         r.transferTo(wateringCanSlot)
         index = index - 1
       end
+    else
+      storeOther(index)
     end
   end
-  --destroy(2)
-  --destroy(6)
-  --destroy(10)
-  --storeOther(3)
-  --storeOther(4)
-  --storeOther(5)
-  --storeOther(7)
-  --storeOther(8)
-  --storeOther(9)
-  --storeOther(11)
-  --storeOther(12)
-  --storeOther(13)
-  --storeOther(14)
-  --storeOther(15)
 end
 
 function breakAll()
