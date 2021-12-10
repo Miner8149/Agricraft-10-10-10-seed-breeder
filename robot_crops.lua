@@ -34,16 +34,33 @@ local r = require("robot")
 local s = require("sides")
 local event = require("event")
 
-numCropsticksPlaced = nil
-childSeedPresent = false
-actionSlot = 0
 
-pos = 0 -- -1 is left, 0 is center, 1 is right
-rot = 0 -- 0-front, 1-right, 2-back, 3-left
+local numCropsticksPlaced = nil
+local childSeedPresent = false
+local actionSlot = 0
+local mode = "clipping"  --Availiable modes are clipping and replacing
+
+-- clipping mode will take a clipping of each new crop to replace both parents at once, 
+-- replacing will replace the lowest parent
+-- it will swap modes automatically to accomidate the presence of clippers.
+-- replacing mode: avg time for 1.1.1 seeds to 10.10.10 seeds is 67 mins
+-- clipping mode: avg time for 1.1.1 seeds to 10.10.10 seeds is not calulated yet
+
+local pos = 0 --  -1 is left, 0 is center, 1 is right
+local rot = 0 --  0-front, 1-right, 2-back, 3-left
+
+--Slot Config
+local newParentSeedSlot = 10
+local brokenParentSeedSlot = 6
+local childSeedSlot = 2
+local clippingSeedSlot = 14
+local cropStickSlot = 1
+local wateringCanSlot = 16
+local clippersSlot = 15
+
 
 function goTo(posL, rotL)
   --print("Going to Position: ", posL, ", Rotation: ", rotL)
-  
   local rotC = rotL - rot
   local posC = posL - pos
   local forwardMoved = false
@@ -98,7 +115,7 @@ end
 
 function getCropSticks() --keep 48 on the robot max, 8 min
   --print("Fetching Cropsticks")
-  local cropstickcount = ic.getStackInInternalSlot(1)
+  local cropstickcount = ic.getStackInInternalSlot(cropStickSlot)
   local getNumber = 0
   if(cropstickcount == nil) then
     getNumber = 48
@@ -110,7 +127,7 @@ function getCropSticks() --keep 48 on the robot max, 8 min
   end
   goTo(0, 0)
   local chestSlot = nil
-  r.select(1)
+  r.select(cropStickSlot)
   for index=1,ic.getInventorySize(s.top) do
     chestSlot = ic.getStackInSlot(s.top,index)
     if (chestSlot ~= nil) then
@@ -133,7 +150,7 @@ function destroy(slot) --void item in "slot" to trashcan
   goTo(-1, 3)
   r.select(slot)
   r.drop()
-  r.select(1)
+  --r.select(1)
 end
 
 function storeFinished(slot)
@@ -144,11 +161,11 @@ function storeFinished(slot)
 end
 
 function storeOther(slot)
-  print("Storing Other")
+  print("Storing Other: ", slot)
   goTo(0, 2)
   r.select(slot)
   r.drop()
-  r.select(1)
+  --r.select(1)
 end
 
 function placeAnalyzeSeed(slot)
@@ -171,7 +188,7 @@ function placeSingleCropstick(posL, index)
   print("Placing single cropsticks at ", posL)
   getCropSticks()
   goTo(posL, 0)
-  r.select(1)
+  r.select(cropStickSlot)
   r.place(s.front, false)
   local confirmSticks = 1 --requestData(2, posL)
   if (confirmSticks ~= 1) or (confirmSticks == nil) then
@@ -190,7 +207,7 @@ function placeDoubleCropstick(posL, index)
   print("Placing double cropsticks at ", posL)
   getCropSticks()
   goTo(posL, 0)
-  r.select(1)
+  r.select(cropStickSlot)
   r.place(s.front, true)
   local confirmSticks = 2 --requestData(2, posL)
   if (confirmSticks ~= 2) or (confirmSticks == nil) then
@@ -209,7 +226,7 @@ function waterCrops() --watering can in slot 16
   --This is a work in progress, but the watering can isnt working... yes, I changed the config
   print("Watering...")
   goTo(0, 0)
-  r.select(16)
+  r.select(wateringCanSlot)
   --ic.equip()
   --r.use(s.all, true, 10)
   --ic.equip()
@@ -219,22 +236,22 @@ end
 
 function breakChildSeed()
   print("Breaking Child Seed")
-  local slotTwo = ic.getStackInInternalSlot(2)
-  if (slotTwo ~= nil) then
-    storeOther(2)
+  local slotForChildSeed = ic.getStackInInternalSlot(childSeedSlot)
+  while (slotForChildSeed ~= nil) do
+    storeOther(childSeedSlot)
   end
-  r.select(2)
+  r.select(childSeedSlot)
   goTo(0, 0)
   r.swing()
 end
 
 function breakParentSeed(location) -- -1 or 1
   print("Breaking Parent at ", location)
-  local slotSix = ic.getStackInInternalSlot(6)
-  if (slotSix ~= nil) then
-    storeOther(6)
+  local slotForBrokenParentSeed = ic.getStackInInternalSlot(brokenParentSeedSlot)
+  while (slotForBrokenParentSeed ~= nil) do
+    storeOther(brokenParentSeedSlot)
   end
-  r.select(6)
+  r.select(brokenParentSeedSlot)
   goTo(location, 0)
   r.swing()
 end
@@ -264,18 +281,18 @@ function getNewSeeds()  --returns true on sucess, false otherwise
   goTo(1, 2)
   local chestSlot = nil
   local numSeeds = 0
-  r.select(10)
+  r.select(newParentSeedSlot)
   for index=1,ic.getInventorySize(s.front) do
     chestSlot = ic.getStackInSlot(s.front,index)
     if (chestSlot ~= nil) then
       numSeeds = chestSlot["size"]
-      if (numSeeds==2) then
-        ic.suckFromSlot(s.front,index,2)
+      if (numSeeds==2) or (numSeeds==1) then
+        ic.suckFromSlot(s.front,index,numSeeds)
         print("Found Seeds")
-        initParents(10)
+        initParents(newParentSeedSlot)
         return true
       else
-        print("Not 2 Seeds!")
+        print("Not 2 or 1 Seeds!")
         --return false
       end
     end
@@ -294,20 +311,47 @@ function initParents(slot)
 end
 
 function clearInv()
-  destroy(2)
-  destroy(6)
-  destroy(10)
-  storeOther(3)
-  storeOther(4)
-  storeOther(5)
-  storeOther(7)
-  storeOther(8)
-  storeOther(9)
-  storeOther(11)
-  storeOther(12)
-  storeOther(13)
-  storeOther(14)
-  storeOther(15)
+  local invSlot = nil
+  for index=1,r.inventorySize() do
+    r.select(index)
+    invSlot = ic.getStackInInternalSlot(index)
+    if ((string.match(invSlot["name"], "crop") == "crop") and (string.match(invSlot["name"], "stick") == "stick") and (index ~= 1))  then
+      storeOther(index)
+    elseif ((invSlot["name"] == "agricraft:clippers") and (index ~= clippersSlot)) then
+      local subCheckInv = ic.getStackInInternalSlot(clippersSlot)
+      if (subCheckInv["name"] == "agricraft:clippers") then
+        storeOther(index)
+      else
+        r.transferTo(clippersSlot)
+        index = index - 1
+      end
+    elseif ((string.match(invSlot["name"], "Seed") == "Seed") or (string.match(invSlot{"name"], "seed") == "seed")) then
+      destroy(index)
+    elseif (string.match(invslot["name"], "clipping") == "clipping") then
+      destroy(index)
+    elseif ((string.match(invSlot["name"], "water") == "water") and (string.match(invSlot["name"], "can") == "can") and (index ~= wateringCanSlot)) then
+      local subCheckInv = ic.getStackInInternalSlot(wateringCanSlot)
+      if ((string.match(invSlot["name"], "water") == "water") and (string.match(invSlot["name"], "can") == "can")) then
+        storeOther(index)
+      else
+        r.transferTo(wateringCanSlot)
+        index = index - 1
+      end
+  end
+  --destroy(2)
+  --destroy(6)
+  --destroy(10)
+  --storeOther(3)
+  --storeOther(4)
+  --storeOther(5)
+  --storeOther(7)
+  --storeOther(8)
+  --storeOther(9)
+  --storeOther(11)
+  --storeOther(12)
+  --storeOther(13)
+  --storeOther(14)
+  --storeOther(15)
 end
 
 function breakAll()
@@ -318,12 +362,12 @@ function breakAll()
   r.swing()
   goTo(-1, 0)
   r.swing()
-  goTo(-1, 3)
-  for index=2,15 do
-    r.select(index)
-    r.drop()
-  end
-  r.select(1)
+  --goTo(-1, 3)
+  --for index=2,15 do
+  --  r.select(index)
+  --  r.drop()
+  --end
+  --r.select(1)
 end
 
 function requestData(funct, slot) --can request init (0), isplant(1, slot), is cropstick(2, slot), analyze(3), decide analyze location(4)
@@ -356,6 +400,40 @@ function requestData(funct, slot) --can request init (0), isplant(1, slot), is c
   return returnVal
 end
 
+function obtainClipping()
+  local itemInClippersSlot = ic.getStackInInternalSlot(clippersSlot)
+  local hasClippers = false
+  if (itemInClippersSlot["name"] == "agricraft:clippers") then
+    hasClippers = true
+  else    --look for clippers
+    r.select(clippersSlot)
+    ic.equip()
+    itemInClippersSlot = ic.getStackInInternalSlot(clippersSlot)
+    if (itemInClippersSlot["name"] == "agricraft:clippers") then
+      hasClippers = true
+    else
+      for index=1,r.inventorySize() do
+        r.select(index)
+        itemInClippersSlot = ic.getStackInInternalSlot(index)
+        if (itemInClippersSlot["name"] == "agricraft:clippers") then
+          r.transferTo(clippersSlot)
+          hasClippers = true
+        end
+      end
+      if (hasClippers == false) then
+        return nil
+      end
+    end
+  end
+  r.select(clippersSlot)
+  ic.equip()
+  r.select(ClippingSeedSlot)
+  local gotClipping = r.use() --true or false
+  r.select(clippersSlot)
+  ic.equip()
+  return gotClipping
+end
+
 function setup()
   m.open(112)
 end
@@ -365,7 +443,8 @@ while true do
   while not (getCropSticks()) do
     os.sleep(10)
   end
-  breakAll()  
+  breakAll()
+  clearInv()
   while not (getNewSeeds()) do
     goTo(0, 0)
     os.sleep(10)
@@ -373,8 +452,8 @@ while true do
   placeSingleCropstick(1, 0)
   placeDoubleCropstick(0, 0)
   placeSingleCropstick(-1, 0)
-  plantSeed(10, -1, 0)
-  plantSeed(10, 1, 0)
+  plantSeed(newParentSeedSlot, -1, 0)
+  plantSeed(newParentSeedSlot, 1, 0)
   while true do
     while not (childSeedPresent) do
       waterCrops()
@@ -383,22 +462,23 @@ while true do
     breakChildSeed()
     childSeedPresent = false
     placeDoubleCropstick(0, 0)
-    placeAnalyzeSeed(2)
+    placeAnalyzeSeed(childSeedSlot)
     actionSlot = requestData(4, 0)
-    getAnalyzedSeed(2)
-    if (actionSlot == 2) then
-      storeFinished(2)
+    getAnalyzedSeed(childSeedSlot)
+    if (actionSlot == 2) then --just a return val
+      storeFinished(childSeedSlot)
       breakAll()
+      clearInv()
       break
-    elseif (actionSlot == 0) then
-      destroy(2)
-    elseif (actionSlot == nil) then
+    elseif (actionSlot == 0) then --just a return val
+      destroy(childSeedSlot)
+    elseif (actionSlot == nil) then  --just a return val
       print("the seed wasnt analyzed")
-      storeOther(2)
+      storeOther(childSeedSlot)
     else
       breakParentSeed(actionSlot)
       placeSingleCropstick(actionSlot, 0)
-      plantSeed(2, actionSlot, 0)
+      plantSeed(childSeedSlot, actionSlot, 0)
       clearInv()
     end
   end
