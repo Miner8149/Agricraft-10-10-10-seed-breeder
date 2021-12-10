@@ -490,7 +490,7 @@ while true do
   if (numParentSeedsObtained == 2) then
     plantSeed(newParentSeedSlot, -1, 0)
     plantSeed(newParentSeedSlot, 1, 0)
-  elseif (numParentSeedsObtained == 1)
+  elseif (numParentSeedsObtained == 1) then
     plantSeed(newParentSeedSlot, 1, 0)
     while true do
       if (obtianClipping(1) == nil) then
