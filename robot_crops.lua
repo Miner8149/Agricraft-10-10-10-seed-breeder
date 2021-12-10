@@ -527,9 +527,11 @@ while true do
       break
     elseif (actionSlot == 0) then --means the seed is equal to or less than parents (trash)
       destroy(childSeedSlot)
+      clearInv()
     elseif (actionSlot == nil) then  --the seed wasnt analyzed
       print("the seed wasnt analyzed")
       storeOther(childSeedSlot)
+      clearInv()
     else                            -- 1 or -1 means it is better than the specified parent
       breakParentSeed(actionSlot)
       placeSingleCropstick(actionSlot, 0)
