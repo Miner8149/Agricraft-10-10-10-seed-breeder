@@ -339,9 +339,9 @@ function clearInv()
       --do nothing
     elseif ((string.match(invSlot["name"], "crop") == "crop") and (string.match(invSlot["name"], "stick") == "stick") and (index ~= cropStickSlot))  then
       storeOther(index)
-    elseif ((invSlot["name"] == "agricraft:clippers") and (index ~= clippersSlot)) then
+    elseif ((index ~= clippersSlot) and (string.match(invSlot["name"], "clipper")) then
       local subCheckInv = ic.getStackInInternalSlot(clippersSlot)
-      if ((subCheckInv ~= nil) and (subCheckInv["name"] == "agricraft:clippers")) then
+      if ((subCheckInv ~= nil) and (string.match(subCheckInv["name"], "clipper")) then
         storeOther(index)
       else
         r.transferTo(clippersSlot)
@@ -414,19 +414,19 @@ end
 function obtainClipping()
   local itemInClippersSlot = ic.getStackInInternalSlot(clippersSlot)
   local hasClippers = false
-  if ((itemInClippersSlot ~= nil) and (itemInClippersSlot["name"] == "agricraft:clippers")) then
+  if ((itemInClippersSlot ~= nil) and (string.match(itemInClippersSlot["name"], "clipper")) then
     hasClippers = true
   else    --look for clippers
     r.select(clippersSlot)
     ic.equip()
     itemInClippersSlot = ic.getStackInInternalSlot(clippersSlot)
-    if ((itemInClippersSlot ~= nil) and (itemInClippersSlot["name"] == "agricraft:clippers")) then
+    if ((itemInClippersSlot ~= nil) and (string.match(itemInClippersSlot["name"], "clipper")) then
       hasClippers = true
     else
       for index=1,r.inventorySize() do
         r.select(index)
         itemInClippersSlot = ic.getStackInInternalSlot(index)
-        if ((itemInClippersSlot ~= nil) and (itemInClippersSlot["name"] == "agricraft:clippers")) then
+        if ((itemInClippersSlot ~= nil) and (string.match(itemInClippersSlot["name"], "clipper")) then
           r.transferTo(clippersSlot)
           hasClippers = true
         end
@@ -454,6 +454,7 @@ while true do
   while not (getCropSticks()) do
     os.sleep(10)
   end
+  clearInv()
   breakAll()
   clearInv()
   while not (getNewSeeds()) do
