@@ -302,7 +302,7 @@ function getNewSeeds()  --returns true on sucess, false otherwise
   r.select(newParentSeedSlot)
   for index=1,ic.getInventorySize(s.front) do
     chestSlot = ic.getStackInSlot(s.front,index)
-    if ((chestSlot ~= nil) and (((string.match(invSlot["name"], "Seed") == "Seed") or (string.match(invSlot{"name"], "seed") == "seed")) or (string.match(invslot["name"], "clipping") == "clipping")))then
+    if ((chestSlot ~= nil) and (((string.match(invSlot["name"], "Seed") == "Seed") or (string.match(invSlot["name"], "seed") == "seed")) or (string.match(invslot["name"], "clipping") == "clipping")))then
       numSeeds = chestSlot["size"]
       if (numSeeds==2) or (numSeeds==1) then
         ic.suckFromSlot(s.front,index,numSeeds)
