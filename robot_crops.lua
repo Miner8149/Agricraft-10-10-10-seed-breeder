@@ -337,27 +337,33 @@ function clearInv()
     invSlot = ic.getStackInInternalSlot(index)
     if (invSlot == nil) then
       --do nothing
-    elseif ((string.match(invSlot["name"], "crop") == "crop") and (string.match(invSlot["name"], "stick") == "stick") and (index ~= cropStickSlot))  then
-      storeOther(index)
-    elseif ((index ~= clippersSlot) and (string.match(invSlot["name"], "clipper"))) then
-      local subCheckInv = ic.getStackInInternalSlot(clippersSlot)
-      if ((subCheckInv ~= nil) and (string.match(subCheckInv["name"], "clipper"))) then
+    elseif ((string.match(invSlot["name"], "crop") == "crop") and (string.match(invSlot["name"], "stick") == "stick"))  then
+      if (index ~= cropStickSlot) then
         storeOther(index)
-      else
-        r.transferTo(clippersSlot)
-        index = index - 1
+      end
+    elseif (string.match(invSlot["name"], "clipper")) then
+      if (index ~= clippersSlot) then
+        local subCheckInv = ic.getStackInInternalSlot(clippersSlot)
+        if ((subCheckInv ~= nil) and (string.match(subCheckInv["name"], "clipper"))) then
+          storeOther(index)
+        else
+          r.transferTo(clippersSlot)
+          index = index - 1
+        end
       end
     elseif ((string.match(invSlot["name"], "Seed") == "Seed") or (string.match(invSlot["name"], "seed") == "seed")) then
       destroy(index)
     elseif (string.match(invSlot["name"], "clipping") == "clipping") then
       destroy(index)
-    elseif ((string.match(invSlot["name"], "water") == "water") and (string.match(invSlot["name"], "can") == "can") and (index ~= wateringCanSlot)) then
-      local subCheckInv = ic.getStackInInternalSlot(wateringCanSlot)
-      if ((string.match(invSlot["name"], "water") == "water") and (string.match(invSlot["name"], "can") == "can")) then
-        storeOther(index)
-      else
-        r.transferTo(wateringCanSlot)
-        index = index - 1
+    elseif ((string.match(invSlot["name"], "water") == "water") and (string.match(invSlot["name"], "can") == "can")) then
+      if (index ~= wateringCanSlot) then
+        local subCheckInv = ic.getStackInInternalSlot(wateringCanSlot)
+        if ((string.match(invSlot["name"], "water") == "water") and (string.match(invSlot["name"], "can") == "can")) then
+          storeOther(index)
+        else
+          r.transferTo(wateringCanSlot)
+          index = index - 1
+        end
       end
     else
       storeOther(index)
