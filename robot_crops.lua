@@ -458,7 +458,7 @@ function obtainClipping(location)
   goTo(location, 0)
   r.select(clippersSlot)
   ic.equip()
-  r.select(ClippingSeedSlot)
+  r.select(clippingSeedSlot)
   local gotClipping = r.use() --true or false
   r.select(clippersSlot)
   ic.equip()
@@ -510,7 +510,7 @@ while true do
       childSeedPresent = requestData(1, 0)
       --check for clippers
       local invClipperSlot = ic.getStackInInternalSlot(clippersSlot)
-      if ((invClipperSlot ~= nil) and (string.match(itemInClippersSlot["name"], "clipper") == "clipper")) then
+      if ((invClipperSlot ~= nil) and (string.match(invClipperSlot["name"], "clipper") == "clipper")) then
         mode = "clipping"
       end
     end
