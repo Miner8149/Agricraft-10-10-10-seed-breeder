@@ -1,6 +1,8 @@
 --Miner8149
 --12/7/2021
 
+-- Visit my github for a more detailed set of instructions https://github.com/Miner8149/Agricraft-10-10-10-seed-breeder
+-- https://pastebin.com/VrrGhuKT
 -- Copyright 2020 Miner8149
 --
 -- Permission is hereby granted, free of charge, to any person obtaining a copy
