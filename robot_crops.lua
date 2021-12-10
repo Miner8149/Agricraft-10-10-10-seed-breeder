@@ -358,6 +358,7 @@ function clearInv()
         r.transferTo(wateringCanSlot)
         index = index - 1
       end
+    end
   end
   --destroy(2)
   --destroy(6)
