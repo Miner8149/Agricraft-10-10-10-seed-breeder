@@ -130,7 +130,7 @@ function getCropSticks() --keep 48 on the robot max, 8 min
       end
     end
     if not cropStickSlotFree then
-      storeOther(cropSickSlot)
+      storeOther(cropStickSlot)
     end
   end
   local getNumber = 0
