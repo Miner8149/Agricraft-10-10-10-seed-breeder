@@ -539,7 +539,7 @@ while true do
       clearInv()
       if (mode == "clipping") then
         local invSlot = obtainClipping(actionSlot)
-        while (invSlot == false) then
+        while (invSlot == false) do
           invSlot = obtainClipping(actionSlot)
         end
       end
