@@ -493,9 +493,9 @@ while true do
   elseif (numParentSeedsObtained == 1) then
     plantSeed(newParentSeedSlot, 1, 0)
     while true do
-      if (obtianClipping(1) == nil) then
+      if (obtainClipping(1) == nil) then
         loopOneControl = false
-      elseif (obtianClipping(1) == true) then
+      elseif (obtainClipping(1) == true) then
         placeAnalyzeSeed(clippingSeedSlot)
         getAnalyzedSeed(clippingSeedSlot)
         plantSeed(clippingSeedSlot, -1, 0)
